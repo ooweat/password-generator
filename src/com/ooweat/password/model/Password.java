@@ -11,14 +11,15 @@ public class Password {
 
     public static final String SHA_256 = "SHA-256";
     public static final String SHA_512 = "SHA-512";
-    public static final String MD5     = "MD5";
+    public static final String MD5 = "MD5";
 
-    private static final String CHARS_UPPER   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final String CHARS_LOWER   = "abcdefghijklmnopqrstuvwxyz";
-    private static final String CHARS_NUMBER  = "0123456789";
+    private static final String CHARS_UPPER = "ABCDEFGHJKLMNOPQRSTUVWXYZ"; // without I
+    private static final String CHARS_LOWER = "abcdefghijkmnopqrstuvwxyz"; // without l
+    private static final String CHARS_NUMBER = "023456789"; // without 1
     private static final String CHARS_SPECIAL = "!@#$%^&*";
 
-    private Password() {}
+    private Password() {
+    }
 
     /**
      * @param upper     대문자 포함 여부
@@ -30,8 +31,8 @@ public class Password {
      * @return algorithm 이 null 이면 원문, 아니면 해시 문자열
      */
     public static String generator(boolean upper, boolean lower,
-                                   boolean number, boolean special,
-                                   int maxLength, String algorithm) {
+        boolean number, boolean special,
+        int maxLength, String algorithm) {
         if (!upper && !lower && !number && !special) {
             throw new IllegalArgumentException("At least one character type must be selected.");
         }
@@ -40,10 +41,22 @@ public class Password {
         StringBuilder pool = new StringBuilder();
         List<Character> chars = new ArrayList<>();
 
-        if (upper)   { pool.append(CHARS_UPPER);   chars.add(pick(CHARS_UPPER, random)); }
-        if (lower)   { pool.append(CHARS_LOWER);   chars.add(pick(CHARS_LOWER, random)); }
-        if (number)  { pool.append(CHARS_NUMBER);  chars.add(pick(CHARS_NUMBER, random)); }
-        if (special) { pool.append(CHARS_SPECIAL); chars.add(pick(CHARS_SPECIAL, random)); }
+        if (upper) {
+            pool.append(CHARS_UPPER);
+            chars.add(pick(CHARS_UPPER, random));
+        }
+        if (lower) {
+            pool.append(CHARS_LOWER);
+            chars.add(pick(CHARS_LOWER, random));
+        }
+        if (number) {
+            pool.append(CHARS_NUMBER);
+            chars.add(pick(CHARS_NUMBER, random));
+        }
+        if (special) {
+            pool.append(CHARS_SPECIAL);
+            chars.add(pick(CHARS_SPECIAL, random));
+        }
 
         if (maxLength < chars.size()) {
             throw new IllegalArgumentException(
@@ -57,7 +70,9 @@ public class Password {
         Collections.shuffle(chars, random);
 
         StringBuilder sb = new StringBuilder();
-        for (char c : chars) sb.append(c);
+        for (char c : chars) {
+            sb.append(c);
+        }
         String raw = sb.toString();
 
         return algorithm == null ? raw : hash(raw, algorithm);
@@ -72,7 +87,9 @@ public class Password {
             MessageDigest md = MessageDigest.getInstance(algorithm);
             byte[] bytes = md.digest(raw.getBytes());
             StringBuilder sb = new StringBuilder();
-            for (byte b : bytes) sb.append(String.format("%02x", b));
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Unsupported algorithm: " + algorithm, e);
